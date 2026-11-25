@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>発表者ルーレット 完全版</title>
+<style>
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#4f46e5,#06b6d4);color:white;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.container{text-align:center;background:rgba(255,255,255,.15);padding:30px;border-radius:24px;width:90%;max-width:700px;backdrop-filter:blur(10px)}
+#number{font-size:120px;font-weight:bold;margin:20px;text-shadow:0 0 20px rgba(255,255,255,.6)}
+input,button{padding:10px 18px;font-size:18px;border:none;border-radius:10px;margin:5px}
+button{background:#f59e0b;color:white;cursor:pointer}
+button:hover{opacity:.9}
+.info{margin-top:10px;font-size:20px}
+#history{margin-top:15px;padding:10px;background:rgba(255,255,255,.12);border-radius:10px;min-height:40px;word-break:break-word}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🎯 発表者ルーレット</h1>
+<div>
+最大出席番号：<input type="number" id="maxNo" value="50" min="1">
+</div>
+<button id="startBtn">スタート</button>
+<button id="resetBtn">リセット</button>
+<div id="number">?</div>
+<div class="info" id="remaining">残り人数：-</div>
+<div id="history">履歴：なし</div>
+</div>
+<script>
+let remaining=[];
+let history=[];
+
+function init(){
+ const max=parseInt(document.getElementById('maxNo').value);
+ remaining=[];
+ history=[];
+ for(let i=1;i<=max;i++) remaining.push(i);
+ updateDisplay();
+}
+
+function updateDisplay(){
+ document.getElementById('remaining').textContent='残り人数：'+remaining.length;
+ document.getElementById('history').textContent='履歴：'+(history.length?history.join(' → '):'なし');
+}
+
+init();
+
+document.getElementById('resetBtn').onclick=()=>{
+ init();
+ document.getElementById('number').textContent='?';
+};
+
+document.getElementById('startBtn').onclick=()=>{
+ if(remaining.length===0){
+  document.getElementById('number').textContent='終了';
+  alert('全員が選ばれました。リセットしてください。');
+  return;
+ }
+
+ const btn=document.getElementById('startBtn');
+ btn.disabled=true;
+ let count=0;
+ const timer=setInterval(()=>{
+   const temp=remaining[Math.floor(Math.random()*remaining.length)];
+   document.getElementById('number').textContent=temp;
+   count++;
+
+   if(count>70){
+      clearInterval(timer);
+      const idx=Math.floor(Math.random()*remaining.length);
+      const winner=remaining[idx];
+      remaining.splice(idx,1);
+      history.push(winner);
+
+      const num=document.getElementById('number');
+      num.textContent=winner;
+      num.style.transform='scale(1.3)';
+      setTimeout(()=>num.style.transform='scale(1)',300);
+
+      updateDisplay();
+      btn.disabled=false;
+   }
+ },50);
+};
+</script>
+</body>
+</html>
